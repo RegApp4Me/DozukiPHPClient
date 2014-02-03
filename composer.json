@@ -1,0 +1,17 @@
+{
+    "name": "WhyteSpyder/dozuki-api-php-client",
+    "type": "library",
+    "description": "Client library for Dozuki API",
+    "keywords": ["dozuki"],
+    "homepage": "https://github.com/WhyteSpyder/dozuki-api-php-client",
+    "license": "Apache-2.0",
+    "require": {
+        "php": ">=5.2.1"
+    },
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    },
+    "include-path": ["src/"]
+}
