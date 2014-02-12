@@ -1,3 +1,4 @@
 <?php
-set_include_path(dirname(dirname(__FILE__)) . "/src"
- . PATH_SEPARATOR . get_include_path());
+
+$autoloader = require __DIR__ . '/../vendor/autoload.php';
+$autoloader->add('DozukiPHPClient\\Tests\\', __DIR__);
