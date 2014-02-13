@@ -24,8 +24,8 @@ namespace WhyteSpyder\DozukiPHPClient;
 class DozukiTest extends \PHPUnit_Framework_TestCase
 {
     protected $dozuki;
-    private   $_apiEndpoint = "http://purkeys.dozuki.com";
-    private   $_appId = "0901cc8bd0ffd2a379eddc1788a7b267";
+    private   $_apiEndpoint = "http://example.dozuki.com";
+    private   $_appId = "<YOUR APP ID>";
 
     /**
      * setUp
