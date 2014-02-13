@@ -102,7 +102,7 @@ class DozukiTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetCategoriesAll()
     {
-        $categoryObject = $this->dozuki->getCategories();
-        $this->assertInternalType('object', $categoryObject, 'Not an object');
+        $categoryObject = $this->dozuki->getCategoriesAll();
+        $this->assertInternalType('array', $categoryObject, 'Not an array');
     }
 }
