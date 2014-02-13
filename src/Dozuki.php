@@ -41,49 +41,53 @@ namespace WhyteSpyder\DozukiPHPClient;
  */
 class Dozuki
 {
-    private $_api_endpoint;
+    private $_apiEndpoint;
     private $_appId;
     private $_authToken;
 
     /**
      * Constructor
      * 
-     * @param string $api_endpoint The client site for the Dozuki account
-     * @param string $appId        The appId associated with Dozuki account
+     * @param string $apiEndpoint The client site for the Dozuki account
+     * @param string $appId       The appId associated with Dozuki account
      *
      * @return null
      */
-    public function __construct( $api_endpoint, $appId = null )
+    public function __construct( $apiEndpoint, $appId = null )
     {
         if (!in_array('curl', get_loaded_extensions())) {
             throw new Exception('You need to install cURL, see: http://curl.haxx.se/docs/install.html');
         }
 
-        if (!filter_var($api_endpoint, FILTER_VALIDATE_URL)) {
-            throw new Exception('$api_endpoint must be a valid URL');
+        if (!filter_var($apiEndpoint, FILTER_VALIDATE_URL)) {
+            throw new Exception('API Endpoint must be a valid URL');
+        } else {
+            $this->_apiEndpoint = "{$apiEndpoint}/api/2.0/";
         }
 
-        $this->_api_endpoint = "{$api_endpoint}/api/2.0/";
-
-        if (!is_null($appId)) {
+        if (is_null($appId)) {
+            throw new Exception('App ID is required');
+        } else {
             $this->_appId = $appId;
         }
     }
 
     /**
-     * Get list of categories
+     * List all category titles in the hierarchy structure except for stubs.
      *
      * @return null
      */
     public function getCategories()
     {
-        $request_url = $this->_api_endpoint . "categories";
+        $requestUrl = $this->_apiEndpoint . "categories";
 
-        return $this->get($request_url);
+        return $this->get($requestUrl);
     }
 
     /**
-     * Get a specific category
+     * Returns a comprehensive list of attributes about a category, including 
+     * the full text of the main category page and a list of all guides. The 
+     * category name must be URL encoded.
      *
      * @param string $categoryname Identifier for category
      *
@@ -91,9 +95,21 @@ class Dozuki
      */
     public function getCategory($categoryname)
     {
-        $request_url = $this->_api_endpoint . "categories/{$categoryname}";
+        $requestUrl = $this->_apiEndpoint . "categories/{$categoryname}";
 
-        return $this->get($request_url);
+        return $this->get($requestUrl);
+    }
+
+    /**
+     * Returns a flat list of the category names on the site.
+     *
+     * @return null
+     */
+    public function getCategoriesAll()
+    {
+        $requestUrl = $this->_apiEndpoint . "categories/all";
+
+        return $this->get($requestUrl);
     }
 
     /**
@@ -103,9 +119,9 @@ class Dozuki
      */
     public function getGuides()
     {
-        $request_url = $this->_api_endpoint . "guides";
+        $requestUrl = $this->_apiEndpoint . "guides";
 
-        return $this->get($request_url);
+        return $this->get($requestUrl);
     }
 
     /**
@@ -117,23 +133,23 @@ class Dozuki
      */
     public function getGuide($guideid)
     {
-        $request_url = $this->_api_endpoint . "guides/{$guideid}";
+        $requestUrl = $this->_apiEndpoint . "guides/{$guideid}";
 
-        return $this->get($request_url);
+        return $this->get($requestUrl);
     }
 
     /**
-     * Get something
+     * GET something
      *
-     * @param string $request_url Modified request URL
+     * @param string $requestUrl Modified request URL
      *
      * @return $response
      */
-    public function get( $request_url )
+    public function get( $requestUrl )
     {
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $request_url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Accept-Charset: utf-8"));
+        curl_setopt($ch, CURLOPT_URL, $requestUrl);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Accept-Charset: utf-8"]);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         $content = curl_exec($ch);
@@ -142,7 +158,7 @@ class Dozuki
             $error = curl_error($ch);
             curl_close($ch);
 
-            throw new \Exception("Failed retrieving  '" . $request_url . "' because of ' " . $error . "'.");
+            throw new \Exception("Failed retrieving  '" . $requestUrl . "' because of ' " . $error . "'.");
         }
 
         $response = json_decode($content);
@@ -158,7 +174,7 @@ class Dozuki
                 $error = 'Status ' . $status;
             }
 
-            throw new \Exception("Failed retrieving  '" . $request_url . "' because of ' " . $error . "'.");
+            throw new \Exception("Failed retrieving  '" . $requestUrl . "' because of ' " . $error . "'.");
         }
 
         if (isset($response) == false) {
@@ -187,7 +203,80 @@ class Dozuki
                 break;
             }
     
-            throw new \Exception("Cannot read response by  '" . $request_url . "' because of: '" . $error . "'.");
+            throw new \Exception("Cannot read response by  '" . $requestUrl . "' because of: '" . $error . "'.");
+        }
+
+        return $response;
+    }
+
+    /**
+     * POST something
+     *
+     * @param string $requestUrl Modified request URL
+     * @param array  $postBody   Post body to be encoded and sent with request
+     *
+     * @return $response
+     */
+    public function post( $requestUrl, $postBody )
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $requestUrl);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-App-Id: {$this->appId}"]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postBody));
+        $content = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            $error = curl_error($ch);
+            curl_close($ch);
+
+            throw new \Exception("Failed retrieving  '" . $requestUrl . "' because of ' " . $error . "'.");
+        }
+
+        $response = json_decode($content);
+        $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        curl_close($ch);
+
+        if ($status != 200) {
+
+            if (isset($response->errors[0]->message)) {
+                $error = $response->errors[0]->message;
+            } else {
+                $error = 'Status ' . $status;
+            }
+
+            throw new \Exception("Failed retrieving  '" . $requestUrl . "' because of ' " . $error . "'.");
+        }
+
+        if (isset($response) == false) {
+
+            switch (json_last_error()) {
+            case JSON_ERROR_NONE:
+                $error = 'No errors';
+                break;
+            case JSON_ERROR_DEPTH:
+                $error = 'Maximum stack depth exceeded';
+                break;
+            case JSON_ERROR_STATE_MISMATCH:
+                $error = ' Underflow or the modes mismatch';
+                break;
+            case JSON_ERROR_CTRL_CHAR:
+                $error = 'Unexpected control character found';
+                break;
+            case JSON_ERROR_SYNTAX:
+                $error = 'Syntax error, malformed JSON';
+                break;
+            case JSON_ERROR_UTF8:
+                $error = 'Malformed UTF-8 characters, possibly incorrectly encoded';
+                break;
+            default:
+                $error = 'Unknown error';
+                break;
+            }
+    
+            throw new \Exception("Cannot read response by  '" . $requestUrl . "' because of: '" . $error . "'.");
         }
 
         return $response;

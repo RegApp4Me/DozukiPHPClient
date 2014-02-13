@@ -24,6 +24,8 @@ namespace WhyteSpyder\DozukiPHPClient;
 class DozukiTest extends \PHPUnit_Framework_TestCase
 {
     protected $dozuki;
+    private   $_apiEndpoint = "http://purkeys.dozuki.com";
+    private   $_appId = "0901cc8bd0ffd2a379eddc1788a7b267";
 
     /**
      * setUp
@@ -32,7 +34,7 @@ class DozukiTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp ()
     {
-        $this->dozuki = new Dozuki("http://example.dozuki.com");
+        $this->dozuki = new Dozuki($this->_apiEndpoint, $this->_appId);
     }
 
     /**
@@ -90,6 +92,17 @@ class DozukiTest extends \PHPUnit_Framework_TestCase
     public function testGetCategory()
     {
         $categoryObject = $this->dozuki->getCategory("Examples");
+        $this->assertInternalType('object', $categoryObject, 'Not an object');
+    }
+
+    /**
+     * testGetCategoriesAll
+     *
+     * @return null
+     */
+    public function testGetCategoriesAll()
+    {
+        $categoryObject = $this->dozuki->getCategories();
         $this->assertInternalType('object', $categoryObject, 'Not an object');
     }
 }
