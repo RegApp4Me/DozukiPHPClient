@@ -139,6 +139,46 @@ class Dozuki
     }
 
     /**
+     * List of work log entries.
+     *
+     * @return null
+     */
+    public function getWorkLogs()
+    {
+        $requestUrl = $this->_apiEndpoint . "work_log";
+
+        return $this->get($requestUrl);
+    }
+
+    /**
+     * Get all information about an entry with a known entryid.
+     *
+     * @param int $entryid Unique ID for work log entry
+     *
+     * @return null
+     */
+    public function getWorkLog($entryid)
+    {
+        $requestUrl = $this->_apiEndpoint . "work_log/{$entryid}";
+
+        return $this->get($requestUrl);
+    }
+
+    /**
+     * Search for content matching the provided query
+     *
+     * @param int $query Search terms
+     *
+     * @return null
+     */
+    public function getSearch($query)
+    {
+        $requestUrl = $this->_apiEndpoint . "search/{$query}";
+
+        return $this->get($requestUrl);
+    }
+
+    /**
      * GET something
      *
      * @param string $requestUrl Modified request URL
