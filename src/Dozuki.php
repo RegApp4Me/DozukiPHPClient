@@ -73,6 +73,48 @@ class Dozuki
     }
 
     /**
+     * Create an authorization token for an existing user account using the provided credentials.
+     *
+     * @param string $email    Account's email address.
+     * @param string $password Account's password.
+     *
+     * @return null
+     */
+    public function getAuthToken($email, $password)
+    {
+        $requestUrl = $this->_apiEndpoint . "user/token";
+
+        $postBody = [
+            'email' => $email,
+            'password' => $password
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $requestUrl);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-App-Id: {$this->_appId}"]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postBody));
+        $content = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            $error = curl_error($ch);
+            curl_close($ch);
+
+            throw new \Exception("Failed retrieving  '" . $requestUrl . "' because of ' " . $error . "'.");
+        }
+
+        $response = json_decode(curl_exec($ch), true);
+
+        if (!isset($response['authToken'])) {
+            throw new \Exception("Failed retrieving  '" . $requestUrl . "' because of ' " . $error . "'.");
+        }
+
+        $this->_authToken = $response['authToken'];
+    }
+
+    /**
      * List all category titles in the hierarchy structure except for stubs.
      *
      * @return null
@@ -139,6 +181,35 @@ class Dozuki
     }
 
     /**
+     * Create a new guide
+     *
+     * @param string $category     The category of the guide. A list of categories can be retrieved from the categories endpoints. Case sensitive.
+     * @param string $type         The type of procedure the guide explains. Used to organize content.
+     * @param string $subject      The subject of the guide.
+     * @param string $title        Custom guide title. If not set, a default title is generated using the guide type, category, and subject.
+     * @param string $summary      Short description of the guide. Must be less than 255 characters.
+     * @param string $introduction Introduction text for the guide. Must be less than 50 lines.
+     * @param string $conclusion   Conclusion text of the guide.
+     * @param bool   $public       Set the guide to public or private.
+     *
+     * @return null
+     */
+    public function postGuide($category, $type, $subject = '', $title = '', $summary ='', $introduction = '', $conclusion = '', $public = true)
+    {
+        if (!is_string($category) || !is_string($type)) {
+            throw new \Exception("Failed");
+        }
+        $requestUrl = $this->_apiEndpoint . "guides";
+
+        $postBody = [
+            'category' => $category,
+            'type' => $type
+        ];
+
+        return $this->post($requestUrl, json_encode($postBody));
+    }
+
+    /**
      * List of work log entries.
      *
      * @return null
@@ -167,11 +238,18 @@ class Dozuki
     /**
      * Search for content matching the provided query
      *
-     * @param int $query Search terms
+     * @param int    $query  Search terms
+     * @param int    $offset The number of results to skip from the beginning. 
+     *        Range: [0, infinity). Defaults to 0.
+     * @param int    $limit  The maximum number of results to include in the response. 
+     *        Range: [1, 200]. Defaults to 20.
+     * @param string $filter Filters search results by their type. Filters can be 
+     *        combined into a comma-separated string to apply multiple filters.
+     *        Possible Values: guide, teardown, wiki, category, item, info, question, product
      *
      * @return null
      */
-    public function getSearch($query)
+    public function getSearch($query, $offset = 0, $limit = 20, $filter = '')
     {
         $requestUrl = $this->_apiEndpoint . "search/{$query}";
 
@@ -262,8 +340,10 @@ class Dozuki
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $requestUrl);
         curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-App-Id: {$this->appId}"]);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-App-Id: {$this->_appId}"]);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Authorization: api {$this->_authToken}"]);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postBody));
         $content = curl_exec($ch);
 
@@ -321,6 +401,4 @@ class Dozuki
 
         return $response;
     }
-
-    // TODO Authentication
 }
