@@ -1,0 +1,70 @@
+{
+	"operations": {
+		"categories": {
+			"description": "List all category titles in the hierarchy structure except for stubs.",
+			"httpMethod": "GET",
+			"parameters": {
+				"requireGuides": {
+					"description": "Return only categories that contain published guides. Defaults to false.",
+					"location": "query"
+				}
+			},
+			"uri": "categories"
+		},
+		"category": {
+			"description": "Returns a comprehensive list of attributes about a category, including the full text of the main category page and a list of all guides. The category name must be URL encoded.",
+			"httpMethod": "GET",
+			"parameters": {
+                "categoryname": {
+                    "description": "The category name must be URL encoded.",
+                    "location": "uri",
+                    "required": true
+                },
+				"type": {
+					"description": "Possible values: JSON or XML. The XML format differs somewhat from the JSON representation. Both encapsulate the same data, but JSON is optimized for web use while XML is similar to oManual format. Defaults to JSON.",
+					"location": "query"
+				}
+			},
+			"uri": "categories/{categoryname}"
+		},
+		"categories/all": {
+			"description": "List all category titles in the hierarchy structure except for stubs.",
+			"httpMethod": "GET",
+			"parameters": {
+				"offset": {
+					"description": "The number of categories to skip from the beginning. Range: [0, infinity). Defaults to 0.",
+					"location": "query"
+				},
+				"limit": {
+					"description": "The maximum number of categories to include in the response. Range: [1, 200]. Defaults to 20.",
+					"location": "query"
+				}
+			},
+			"uri": "categories/all"
+		},
+		"search": {
+			"description": "Search for content matching the provided query",
+			"httpMethod": "GET",
+			"parameters": {
+                "query": {
+                    "description": "Search query.",
+                    "location": "uri",
+                    "required": true
+                },
+				"offset": {
+					"description": "The number of results to skip from the beginning. Range: [0, infinity). Defaults to 0.",
+					"location": "uri"
+				},
+				"limit": {
+					"description": "The maximum number of results to include in the response. Range: [1, 200]. Defaults to 20.",
+					"location": "uri"
+				},
+				"filter": {
+					"description": "Filters search results by their type. Filters can be combined into a comma-separated string to apply multiple filters.",
+					"location": "uri"
+				}
+			},
+			"uri": "search/{query}"
+		}
+	}
+}

@@ -1,3 +1,4 @@
 vendor/
 DozukiPHPClient.sublime-project
 DozukiPHPClient.sublime-workspace
+composer.lock
