@@ -24,11 +24,13 @@ $client = DozukiClient::factory(
     	'dozuki_domain'     => 'example.dozuki.com'    // required
 	)
 );
-$client->addToken($oauthToken); // optionaly pass in for user specific requests
-$command = $client->getCommand('venues/search', array(
-    'near' => 'Chicago, IL',
-    'query' => 'sushi'
-));
+
+$command = $client->getCommand(
+	'category',
+	array(
+    	'categoryname' => 'Test'
+	)
+);
 $results = $command->execute(); // returns an array of results
 ```
 
