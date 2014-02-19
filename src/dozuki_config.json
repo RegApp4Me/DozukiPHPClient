@@ -1,70 +1,453 @@
 {
-	"operations": {
-		"categories": {
-			"description": "List all category titles in the hierarchy structure except for stubs.",
-			"httpMethod": "GET",
-			"parameters": {
-				"requireGuides": {
-					"description": "Return only categories that contain published guides. Defaults to false.",
-					"location": "query"
-				}
-			},
-			"uri": "categories"
-		},
-		"category": {
-			"description": "Returns a comprehensive list of attributes about a category, including the full text of the main category page and a list of all guides. The category name must be URL encoded.",
-			"httpMethod": "GET",
-			"parameters": {
+    "operations": {
+        "categories": {
+            "description": "List all category titles in the hierarchy structure except for stubs.",
+            "httpMethod": "GET",
+            "parameters": {
+                "requireGuides": {
+                    "description": "Return only categories that contain published guides. Defaults to false.",
+                    "location": "query"
+                }
+            },
+            "uri": "categories"
+        },
+        "category": {
+            "description": "Returns a comprehensive list of attributes about a category, including the full text of the main category page and a list of all guides. The category name must be URL encoded.",
+            "httpMethod": "GET",
+            "parameters": {
                 "categoryname": {
                     "description": "The category name must be URL encoded.",
                     "location": "uri",
                     "required": true
                 },
-				"type": {
-					"description": "Possible values: JSON or XML. The XML format differs somewhat from the JSON representation. Both encapsulate the same data, but JSON is optimized for web use while XML is similar to oManual format. Defaults to JSON.",
-					"location": "query"
-				}
-			},
-			"uri": "categories/{categoryname}"
-		},
-		"categories/all": {
-			"description": "List all category titles in the hierarchy structure except for stubs.",
-			"httpMethod": "GET",
-			"parameters": {
-				"offset": {
-					"description": "The number of categories to skip from the beginning. Range: [0, infinity). Defaults to 0.",
-					"location": "query"
-				},
-				"limit": {
-					"description": "The maximum number of categories to include in the response. Range: [1, 200]. Defaults to 20.",
-					"location": "query"
-				}
-			},
-			"uri": "categories/all"
-		},
-		"search": {
-			"description": "Search for content matching the provided query",
-			"httpMethod": "GET",
-			"parameters": {
+                "type": {
+                    "description": "Possible values: JSON or XML. The XML format differs somewhat from the JSON representation. Both encapsulate the same data, but JSON is optimized for web use while XML is similar to oManual format. Defaults to JSON.",
+                    "location": "query"
+                }
+            },
+            "uri": "categories/{categoryname}"
+        },
+        "categories/all": {
+            "description": "List all category titles in the hierarchy structure except for stubs.",
+            "httpMethod": "GET",
+            "parameters": {
+                "offset": {
+                    "description": "The number of categories to skip from the beginning. Range: [0, infinity). Defaults to 0.",
+                    "location": "query"
+                },
+                "limit": {
+                    "description": "The maximum number of categories to include in the response. Range: [1, 200]. Defaults to 20.",
+                    "location": "query"
+                }
+            },
+            "uri": "categories/all"
+        },
+        "guides": {
+            "description": "Returns a list of all guides sorted by guideid.",
+            "httpMethod": "GET",
+            "parameters": {
+                "guideids": {
+                    "description": "Comma-delimited list of guideids identifying the guides to return.",
+                    "location": "query"
+                },
+                "filter": {
+                    "description": "Return only guides of the specified type. Possible Values: installation, repair, disassembly, teardown, technique, maintenance",
+                    "location": "query"
+                },
+                "order": {
+                    "description": "Return the guides in ascending or descending order by guideid. Possible Values: ASC, DESC",
+                    "location": "query"
+                },
+                "offset": {
+                    "description": "The number of guides to skip from the beginning. Range: [0, infinity). Defaults to 0.",
+                    "location": "query"
+                },
+                "limit": {
+                    "description": "The maximum number of guides to include in the response. Range: [1, 200]. Defaults to 20.",
+                    "location": "query"
+                }
+            },
+            "uri": "guides"
+        },
+        "guides/featured": {
+            "description": "Returns a list of featured guides. Featured guides are determined by the GUIDE_STARRED flag.",
+            "httpMethod": "GET",
+            "parameters": {
+                "offset": {
+                    "description": "The number of guides to skip from the beginning. Range: [0, infinity). Defaults to 0.",
+                    "location": "query"
+                },
+                "limit": {
+                    "description": "The maximum number of guides to include in the response. Range: [1, 200]. Defaults to 20.",
+                    "location": "query"
+                }
+            },
+            "uri": "guides/featured"
+        },
+        "guide": {
+            "description": "Returns a list of featured guides. Featured guides are determined by the GUIDE_STARRED flag.",
+            "httpMethod": "GET",
+            "parameters": {
+                "guideid": {
+                    "description": "The guide identifier.",
+                    "location": "uri",
+                    "required": true
+                },
+                "excludePrerequisiteSteps": {
+                    "description": "If set, the response will not include steps from prerequisite guides. By default prerequisite guides' steps are inlined with the current guide's steps.",
+                    "location": "query"
+                },
+                "unpatrolled": {
+                    "description": "If set, the guide will include unpatrolled edits if any exist. Edits must be performed using this version of the guide. Defaults to false.",
+                    "location": "query"
+                },
+                "type": {
+                    "description": "Possible values: JSON or XML. Both encapsulate the same data, but JSON is optimized for web use while XML is similar to oManual format. Defaults to JSON.",
+                    "location": "query"
+                }
+            },
+            "uri": "guides/{guideid}"
+        },
+        "guide/create": {
+            "description": "Create a new guide.",
+            "httpMethod": "POST",
+            "parameters": {
+                "category": {
+                    "description": "The category of the guide. A list of categories can be retrieved from the categories endpoints. Case sensitive.",
+                    "location": "postField",
+                    "required": true
+                },
+                "type": {
+                    "description": "The type of procedure the guide explains. Used to organize content. Possible Values: installation, repair, disassembly, teardown, technique, maintenance",
+                    "location": "postField",
+                    "required": true
+                },
+                "subject": {
+                    "description": "The subject of the guide.",
+                    "location": "postField"
+                },
+                "title": {
+                    "description": "Custom guide title. If not set, a default title is generated using the guide type, category, and subject.",
+                    "location": "postField"
+                },
+                "summary": {
+                    "description": "Short description of the guide. Must be less than 255 characters.",
+                    "location": "postField"
+                },
+                "introduction": {
+                    "description": "Introduction text for the guide. Must be less than 50 lines.",
+                    "location": "postField"
+                },
+                "conclusion": {
+                    "description": "Conclusion text of the guide.",
+                    "location": "postField"
+                },
+                "public": {
+                    "description": "Set the guide to public or private. Can also be set through PUT /guide/{guideid}/public and DELETE /guide/{guideid}/public",
+                    "location": "postField"
+                }
+            },
+            "uri": "guides"
+        },
+        "guide/update": {
+            "description": "Updates only the provided fields of an existing guide.",
+            "httpMethod": "PATCH",
+            "parameters": {
+                "guideid": {
+                    "description": "ID of the guide to modify.",
+                    "location": "uri",
+                    "required": true
+                },
+                "revisionid": {
+                    "description": "Current revisionid of the guide.",
+                    "location": "query",
+                    "required": true
+                },
+                "category": {
+                    "description": "The category of the guide. A list of categories can be retrieved from the categories endpoints. Case sensitive.",
+                    "location": "postField"
+                },
+                "type": {
+                    "description": "The type of procedure the guide explains. Used to organize content. Possible Values: installation, repair, disassembly, teardown, technique, maintenance",
+                    "location": "postField"
+                },
+                "subject": {
+                    "description": "The subject of the guide.",
+                    "location": "postField"
+                },
+                "title": {
+                    "description": "Custom guide title. If not set, a default title is generated using the guide type, category, and subject.",
+                    "location": "postField"
+                },
+                "summary": {
+                    "description": "Short description of the guide. Must be less than 255 characters.",
+                    "location": "postField"
+                },
+                "introduction": {
+                    "description": "Introduction text for the guide. Must be less than 50 lines.",
+                    "location": "postField"
+                },
+                "conclusion": {
+                    "description": "Conclusion text of the guide.",
+                    "location": "postField"
+                },
+                "public": {
+                    "description": "Set the guide to public or private. Can also be set through PUT /guide/{guideid}/public and DELETE /guide/{guideid}/public",
+                    "location": "postField"
+                }
+            },
+            "uri": "guides/{guideid}"
+        },
+        "guide/delete": {
+            "description": "Permanently delete a guide.",
+            "httpMethod": "DELETE",
+            "parameters": {
+                "guideid": {
+                    "description": "The guide identifier.",
+                    "location": "uri",
+                    "required": true
+                },
+                "revisionid": {
+                    "description": "Current revisionid of the guide.",
+                    "location": "query",
+                    "required": true
+                }
+            },
+            "uri": "guides/{guideid}"
+        },
+        "guide/public": {
+            "description": "Make a guide public.",
+            "httpMethod": "PUT",
+            "parameters": {
+                "guideid": {
+                    "description": "ID of the guide to modify.",
+                    "location": "uri",
+                    "required": true
+                },
+                "revisionid": {
+                    "description": "Current revisionid of the guide.",
+                    "location": "query",
+                    "required": true
+                }
+            },
+            "uri": "guides/{guideid}/public"
+        },
+        "guide/private": {
+            "description": "Make a guide private.",
+            "httpMethod": "DELETE",
+            "parameters": {
+                "guideid": {
+                    "description": "The guide identifier.",
+                    "location": "uri",
+                    "required": true
+                },
+                "revisionid": {
+                    "description": "Current revisionid of the guide.",
+                    "location": "query",
+                    "required": true
+                }
+            },
+            "uri": "guides/{guideid}/public"
+        },
+        "guide/steps/create": {
+            "description": "Add a step to an existing guide.",
+            "httpMethod": "POST",
+            "parameters": {
+                "guideid": {
+                    "description": "Current guideid.",
+                    "location": "uri",
+                    "required": true
+                },
+                "lines": {
+                    "description": "Array of line objects that make up the text content of the step. Must be at least 1 line and at most 8 lines per step. Each line object contains: text, bullet, level",
+                    "location": "postField",
+                    "required": true
+                },
+                "orderby": {
+                    "description": "Position of the step within the guide. Steps are 1-indexed so possible values are between 1 and COUNT(steps) + 1. Inserting a step in the middle of other steps automatically changes the later steps' orderby values.",
+                    "location": "postField",
+                    "required": true
+                },
+                "media": {
+                    "description": "Media for this step. Includes: type, data",
+                    "location": "postField"
+                },
+                "title": {
+                    "description": "Optional custom title for the step. Defaults to an empty string which is displayed as 'Step #{orderby}'.",
+                    "location": "postField"
+                }
+            },
+            "uri": "guides/{guideid}/steps"
+        },
+        "guide/steps/update": {
+            "description": "Edit a guide step.",
+            "httpMethod": "PATCH",
+            "parameters": {
+                "guideid": {
+                    "description": "Current guideid.",
+                    "location": "uri",
+                    "required": true
+                },
+                "stepid": {
+                    "description": "Current stepid.",
+                    "location": "uri",
+                    "required": true
+                },
+                "revisionid": {
+                    "description": "Current step revisionid.",
+                    "location": "query",
+                    "required": true
+                },
+                "lines": {
+                    "description": "Array of line objects that make up the text content of the step. Must be at least 1 line and at most 8 lines per step. Each line object contains: text, bullet, level",
+                    "location": "postField"
+                },
+                "media": {
+                    "description": "Media for this step. Includes: type, data",
+                    "location": "postField"
+                },
+                "title": {
+                    "description": "Optional custom title for the step. Defaults to an empty string which is displayed as 'Step #{orderby}'.",
+                    "location": "postField"
+                }
+            },
+            "uri": "guides/{guideid}/steps/{stepid}"
+        },
+        "guide/steps/delete": {
+            "description": "Make a guide private.",
+            "httpMethod": "DELETE",
+            "parameters": {
+                "guideid": {
+                    "description": "Current guideid.",
+                    "location": "uri",
+                    "required": true
+                },
+                "stepid": {
+                    "description": "Current stepid.",
+                    "location": "uri",
+                    "required": true
+                },
+                "revisionid": {
+                    "description": "Current revisionid of the guide.",
+                    "location": "query",
+                    "required": true
+                }
+            },
+            "uri": "guides/{guideid}/steps/{stepid}"
+        },
+        "guide/steporder": {
+            "description": "Reorder guide steps.",
+            "httpMethod": "PUT",
+            "parameters": {
+                "guideid": {
+                    "description": "ID of the guide to modify.",
+                    "location": "uri",
+                    "required": true
+                },
+                "revisionid": {
+                    "description": "Current revisionid of the guide.",
+                    "location": "query",
+                    "required": true
+                },
+                "stepids": {
+                    "description": "Array of stepids in the order to set them to. Cannot add or remove steps - must be the same set as the current set of stepids. Note: cannot reorder steps from a prerequisite guide. You can get the list of steps for the given guide without prerequisite steps by providing the excludePrerequisiteSteps query param.",
+                    "location": "query",
+                    "required": true
+                }
+            },
+            "uri": "guides/{guideid}/steporder"
+        },
+        "work_log/entries": {
+            "description": "List of work log entries.",
+            "httpMethod": "GET",
+            "parameters": {
+                "offset": {
+                    "description": "The number of teams to skip from the beginning. Range: [0, infinity). Defaults to 0.",
+                    "location": "query"
+                },
+                "limit": {
+                    "description": "The number of teams to include in the response. Range: [1, 200]. Defaults to 20.",
+                    "location": "query"
+                },
+                "guideid": {
+                    "description": "Limit results to entries attached to a specific guide.",
+                    "location": "query"
+                },
+                "userid": {
+                    "description": "Limit results to entries started by a specific user.",
+                    "location": "query"
+                },
+                "workorderid": {
+                    "description": "Limit results to entries attached to a specific work order.",
+                    "location": "query"
+                }
+            },
+            "uri": "work_log"
+        },
+        "work_log/entry": {
+            "description": "Get all information about an entry with a known entryid.",
+            "httpMethod": "GET",
+            "parameters": {
+                "entryid": {
+                    "description": "Entry identifier.",
+                    "location": "uri",
+                    "required": true
+                }
+            },
+            "uri": "work_log/{entryid}"
+        },
+        "work_log": {
+            "description": "Create a new entry with the current logged in userid and a given guideid, and workorderid.",
+            "httpMethod": "POST",
+            "parameters": {
+                "guideid": {
+                    "description": "Guide to start an entry for.",
+                    "location": "query",
+                    "required": true
+                },
+                "workorderid": {
+                    "description": "Work order number to tie multiple entries together, potentially across guides.",
+                    "location": "query",
+                    "required": true
+                }
+            },
+            "uri": "work_log"
+        },
+        "work_log/entry/finish": {
+            "description": "Set the endtime of an entry to the current time, marking the entry as complete.",
+            "httpMethod": "POST",
+            "parameters": {
+                "entryid": {
+                    "description": "Entry identifier.",
+                    "location": "uri",
+                    "required": true
+                }
+            },
+            "uri": "work_log/{entryid}/finish"
+        },
+        "search": {
+            "description": "Search for content matching the provided query",
+            "httpMethod": "GET",
+            "parameters": {
                 "query": {
                     "description": "Search query.",
                     "location": "uri",
                     "required": true
                 },
-				"offset": {
-					"description": "The number of results to skip from the beginning. Range: [0, infinity). Defaults to 0.",
-					"location": "uri"
-				},
-				"limit": {
-					"description": "The maximum number of results to include in the response. Range: [1, 200]. Defaults to 20.",
-					"location": "uri"
-				},
-				"filter": {
-					"description": "Filters search results by their type. Filters can be combined into a comma-separated string to apply multiple filters.",
-					"location": "uri"
-				}
-			},
-			"uri": "search/{query}"
-		}
-	}
+                "offset": {
+                    "description": "The number of results to skip from the beginning. Range: [0, infinity). Defaults to 0.",
+                    "location": "query"
+                },
+                "limit": {
+                    "description": "The maximum number of results to include in the response. Range: [1, 200]. Defaults to 20.",
+                    "location": "query"
+                },
+                "filter": {
+                    "description": "Filters search results by their type. Filters can be combined into a comma-separated string to apply multiple filters.",
+                    "location": "query"
+                }
+            },
+            "uri": "search/{query}"
+        }
+    }
 }
