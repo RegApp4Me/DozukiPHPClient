@@ -25,6 +25,21 @@ $client = DozukiClient::factory(
 	)
 );
 
+// Authorization required for some API functionality
+// Get Auth Token
+$authRequest = $client->getCommand(
+    'user/token',
+    array(
+        'X-App-Id' => 'YOUR APP ID',
+        'email' => 'admin@example.com',
+        'password' => 'PASSWORD'
+    )
+);
+$response = $authRequest->execute();
+
+// Add Auth Token to client method headers
+$client->addAuthToken($response['authToken']);
+
 $command = $client->getCommand(
 	'category',
 	array(
