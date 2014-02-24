@@ -31,7 +31,6 @@
 namespace WhyteSpyder\DozukiPHPClient;
 
 use Guzzle\Common\Collection;
-use Guzzle\Plugin\Oauth\OauthPlugin;
 use Guzzle\Service\Client;
 use Guzzle\Service\Description\ServiceDescription;
 use Guzzle\Service\Builder\ServiceBuilder;
@@ -48,11 +47,6 @@ use Guzzle\Common\Exception\InvalidArgumentException;
  */
 class DozukiClient extends Client
 {
-    private $_apiEndpoint;
-    private $_appId;
-    private $_authToken;
-    protected $client;
-
     /**
      * Factory
      * 
@@ -76,7 +70,7 @@ class DozukiClient extends Client
         $domain = $config['dozuki_domain'];
 
         // Provide a hash of default client configuration options
-        $default = array('base_url' => "http://{$domain}/api/2.0/");
+        $default = array('base_url' => "https://{$domain}/api/2.0/");
 
         $config = Collection::fromConfig($config, $default, $required);
 
@@ -90,43 +84,13 @@ class DozukiClient extends Client
     /**
      * Create an authorization token for an existing user account using the provided credentials.
      *
-     * @param string $email    Account's email address.
-     * @param string $password Account's password.
+     * @param array $token Authentication token.
      *
      * @return null
      */
-    public function getAuthToken($email, $password)
+
+    public function addAuthToken( $token )
     {
-        $requestUrl = $this->_apiEndpoint . "user/token";
-
-        $postBody = [
-            'email' => $email,
-            'password' => $password,
-            'app_id'
-        ];
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $requestUrl);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-App-Id: {$this->_appId}"]);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postBody));
-        $content = curl_exec($ch);
-
-        if (curl_errno($ch)) {
-            $error = curl_error($ch);
-            curl_close($ch);
-
-            throw new \Exception("Failed retrieving  '" . $requestUrl . "' because of ' " . $error . "'.");
-        }
-
-        $response = json_decode(curl_exec($ch), true);
-
-        if (!isset($response['authToken'])) {
-            throw new \Exception("Failed retrieving  '" . $requestUrl . "' because of ' " . $error . "'.");
-        }
-
-        $this->_authToken = $response['authToken'];
+        $this->setDefaultOption('headers/Authorization', "api $token");
     }
 }

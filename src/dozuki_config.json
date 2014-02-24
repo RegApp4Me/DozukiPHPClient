@@ -1,5 +1,39 @@
 {
+    "name": "Dozuki",
+    "apiVersion": "2.0",
     "operations": {
+        "user/token": {
+            "description": "Create an authorization token for an existing user account using the provided credentials.",
+            "httpMethod": "POST",
+            "parameters": {
+                "email": {
+                    "description": "Account's email address.",
+                    "location": "json",
+                    "required": true
+                },
+                "password": {
+                    "description": "Account's password.",
+                    "location": "json",
+                    "required": true
+                },
+                "X-App-Id": {
+                    "description": "Account's app id.",
+                    "location": "header",
+                    "required": true
+                }
+            },
+            "uri": "user/token"
+        },
+        "user/token/delete": {
+            "description": "Log out the current user by deleting the authorization token.",
+            "httpMethod": "DELETE",
+            "uri": "user/token"
+        },
+        "user": {
+            "description": "Returns the authenticated user's information.",
+            "httpMethod": "GET",
+            "uri": "user"
+        },
         "categories": {
             "description": "List all category titles in the hierarchy structure except for stubs.",
             "httpMethod": "GET",
