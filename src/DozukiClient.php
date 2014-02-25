@@ -76,7 +76,7 @@ class DozukiClient extends Client
 
         $client = new self($config->get('base_url'), $config);
 
-        $client->setDescription(ServiceDescription::factory('dozuki_config.json'));
+        $client->setDescription(ServiceDescription::factory(__DIR__.'/dozuki_config.json'));
 
         return $client;
     }
